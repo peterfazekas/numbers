@@ -35,6 +35,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return  String.format("%d %d %s", point.getPointValue(), answer, question);
+        return  String.format("%d %d %s%n", point.getPointValue(), answer, question);
     }
 }
