@@ -3,6 +3,7 @@ package hu.numbers.service;
 import hu.numbers.model.Task;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Peter_Fazekas on 2017.03.12..
@@ -12,11 +13,12 @@ public class TaskList {
     private final List<Task> tasks;
     private final Random random;
     private Map<String, Map<Integer, Integer>> themes;
-
+    private final Console console;
 
     public TaskList(final List<Task> tasks) {
         this.tasks = tasks;
         random = new Random();
+        console = new Console();
         createThemesMap();
     }
 
@@ -86,7 +88,6 @@ public class TaskList {
                 .get();
     }
 
-
     /**
      * 4. feladat: Mettől meddig terjed a fájlban található válaszok számértéke?
      * A választ egész mondatban írja ki a képernyőre!
@@ -96,6 +97,7 @@ public class TaskList {
     public String getValueBorders() {
         return String.format("%d - %d", getMinValue(), getMaxValue());
     }
+
 
     private int getMinValue() {
         return tasks.stream().min(Comparator.comparingInt(i -> i.getAnswer())).get().getAnswer();
@@ -109,17 +111,47 @@ public class TaskList {
      * 5. feladat: Milyen témakörök szerepelnek ténylegesen az adatfájlban?
      * Írassa ki a témakörök nevét a képernyőre úgy, hogy minden előforduló
      * témakör pontosan egyszer jelenjen meg!
+     *
      * @return String - a helyes válasz
      */
     public String getThemes() {
         StringBuilder sb = new StringBuilder();
-        themes.entrySet().forEach(i-> sb.append(i.getKey() + " "));
+        themes.entrySet().forEach(i -> sb.append(i.getKey() + " "));
         return sb.toString();
+    }
+
+    /**
+     * 6. feladat: Kérje be egy témakör nevét, és véletlenszerűen sorsoljon ki egy kérdést ebből a témakörből!
+     * Sorsoláskor ügyeljen arra, hogy az adott témakörbe eső valamennyi feladatnak legyen esélye!
+     * (Feltételezheti, hogy a felhasználó helyesen adta meg egy létező témakör nevét.)
+     * Írassa ki a kérdést, kérje be a felhasználó válaszát, majd adja meg a válaszért járó pontszámot!
+     * (Helytelen válaszért 0 pont jár.) Ha a válasz helytelen volt, a helyes választ is közölje!
+     */
+    public String getThemeTask() {
+        String theme = console.readLine();
+        String textOut ;
+        if(themes.containsKey(theme)) {
+            Task task = getTask(theme);
+            System.out.print(task.getQuestion() + " ");
+            int answer = console.readInt();
+            textOut = answer == task.getAnswer() ?
+                    "Helyes válasz! Kaptál " + task.getPoint().getPointValue() + " pontot." :
+                    "A válasz 0 pontot er.\nA helyes valasz: " + task.getAnswer();
+        } else {
+            textOut = "Nincs ilyen nevű témakör!";
+        }
+        return textOut;
+    }
+
+    private Task getTask(String theme) {
+        List<Task> tasksOfTheme = tasks.stream().filter(i -> i.getTheme().equals(theme)).collect(Collectors.toList());
+        return tasksOfTheme.get(random.nextInt(tasksOfTheme.size()));
     }
 
     /**
      * Generáljon egy 10 kérdésből álló feladatsort véletlenszerűen úgy,
      * hogy egyetlen feladat se szerepeljen benne kétszer!
+     *
      * @param countOfTasks - a feladatsor kérdéseinek száma
      * @return String - a helyes válasz (feladatsor)
      */

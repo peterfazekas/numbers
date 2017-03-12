@@ -26,7 +26,8 @@ public class App {
         System.out.println("3. feladat: " + tasks.getThemeDetails("matematika"));
         System.out.println("4. feladat: A válaszok számértékének szélsőértékei: " + tasks.getValueBorders());
         System.out.println("5. feladat: A témakörök nevei: " + tasks.getThemes());
-
+        System.out.print("6. feladat: Milyen temakorbol szeretne kerdest kapni?: ");
+        System.out.print(tasks.getThemeTask());
         data.println(tasks.generateExamSheet(10));
     }
 }
